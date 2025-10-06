@@ -28,4 +28,3 @@ textarea { width:100%; padding:10px; font-size:16px; border-radius:5px; border:2
 .footer { margin-top:auto; padding:10px; font-size:13px; opacity:0.6; text-align:center; }
 .pro-badge { font-size:12px; color:#ff9800; margin-left:4px; }
 @media(max-width:600px){ .top-bar{ flex-direction:row; justify-content:space-between; } textarea{ font-size:14px; } .marquee-viewport, .marquee-rsvp{ height:90px; } input[type="file"], button, select, input[type="number"], input[type="range"]{ font-size:14px; padding:6px 10px; min-width:50px; } }
-
