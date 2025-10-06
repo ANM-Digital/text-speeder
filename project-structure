@@ -1,9 +1,16 @@
 text-speeder/
-├─ index.html
-├─ success.html
-├─ cancel.html
+├─ index.html                  ← Main app page (free + rewarded premium + ads)
+├─ success.html                ← Stripe payment success page
+├─ cancel.html                 ← Stripe payment cancel page
+├─ styles/
+│  └─ styles.css               ← Optional, for all CSS
+├─ scripts/
+│  ├─ app.js                   ← Core app logic (free + rewarded + premium logic)
+│  ├─ ads.js                   ← Ad handling logic
+│  └─ stripe.js                ← Stripe integration & checkout logic
+├─ assets/
+│  └─ images/                  ← Any images/icons used in the app
 ├─ netlify/
 │  └─ functions/
-│     └─ create-checkout-session.js
-├─ styles.css  (optional, if you want to separate CSS)
+│     └─ create-checkout-session.js   ← Stripe checkout serverless function
 ├─ README.md
