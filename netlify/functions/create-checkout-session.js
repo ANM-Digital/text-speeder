@@ -1,19 +1,16 @@
 import Stripe from "stripe";
 
-// Option 1: Use environment variable (recommended)
-// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// Use environment variable for restricted key
+const stripe = new Stripe(process.env.STRIPE_RESTRICTED_KEY);
 
-// Option 2: Inline key (for testing only, less secure)
-const stripe = new Stripe("sk_test_XXXXXXXXXXXXXXXXXXXX"); // Replace with your Stripe secret key
-
-// Single Pro product
+// Single Pro product mapping
 const PRODUCT_PRICE_MAP = {
   "pro_upgrade": "price_XXXXXXXXXXXX", // Replace with your Stripe Price ID
 };
 
 export async function handler(event, context) {
   try {
-    // Read the product key from frontend POST request
+    // Get the product requested from frontend
     const { product } = JSON.parse(event.body);
 
     const priceId = PRODUCT_PRICE_MAP[product];
@@ -24,9 +21,10 @@ export async function handler(event, context) {
       };
     }
 
-    // Site URL (replace with your deployed Netlify URL)
-    const siteUrl = "https://textspeeder.netlify.app"; 
+    // Your deployed Netlify site URL
+    const siteUrl = process.env.URL || "https://textspeeder.netlify.app";
 
+    // Create Stripe Checkout session
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
