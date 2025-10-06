@@ -115,4 +115,29 @@ function startAnimation(){
 }
 
 // Load button
+loadBtn.addEventListener('click', ()=>{ renderWords(); startAnimation(); });
 
+// Pause/Resume
+pauseBtn.addEventListener('click', ()=>{ isPaused = !isPaused; pauseBtn.textContent = isPaused?'Resume':'Pause'; });
+
+// Start Over
+startOverBtn.addEventListener('click', ()=>{
+  if(modeSelect.value==='rsvp') currentIndex=0; else pos=flowScreen.clientWidth;
+  startAnimation();
+});
+
+// WPM input/slider sync
+wpmInput.addEventListener('input', ()=>{ let val=parseInt(wpmInput.value); if(isNaN(val)||val<50) val=50; if(val>1000) val=1000; wpmInput.value=val; wpmSlider.value=val; updateSpeed(); });
+wpmSlider.addEventListener('input', ()=>{ wpmInput.value=wpmSlider.value; updateSpeed(); });
+
+// Font/Color/BG changes
+[fontTypeSelect,fontSizeSelect,fontColorSelect,bgColorSelect].forEach(el=>{ el.addEventListener('change', applyStyles); });
+
+// File upload
+document.getElementById('fileInput').addEventListener('change', e=>{ const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=evt=>{ textInput.value=evt.target.result; }; reader.readAsText(file); });
+
+// Mode change listener
+modeSelect.addEventListener('change', () => {
+  if(modeSelect.value!=='flow' && !purchasedPro){ alert('Pro features require purchase.'); modeSelect.value='flow'; return; }
+  isPaused=false; pauseBtn.textContent='Pause'; renderWords(); startAnimation();
+});
