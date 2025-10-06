@@ -12,4 +12,3 @@ export async function checkoutPro() {
 export function unlockPro() {
   localStorage.setItem('purchasedPro', 'true');
 }
-
