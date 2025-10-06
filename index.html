@@ -1,302 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Text Speeder v10.1</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Kalam&family=Playfair+Display&family=Quatracento+Sans&family=Spectrum&display=swap" rel="stylesheet">
-
-<style>
-:root {
-  --bg-color:#111; --text-color:#fff; --border:#444;
-  --input-bg:#ccc; --input-text:#000; --flow-bg:#000; --accent:red;
-}
-[data-theme="light"] {
-  --bg-color:#f5f5f5; --text-color:#000; --border:#aaa;
-  --input-bg:#fff; --input-text:#111; --flow-bg:#f0f0f0; --accent:#0077ff;
-}
-body { margin:0; padding:0; background:var(--bg-color); color:var(--text-color);
-  font-family:"Arial",sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100vh;
-}
-h1 { text-align:center; margin:10px 0; font-size:2rem; }
-.container { width:95%; max-width:900px; text-align:center; position:relative; }
-.top-bar { display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:10px; flex-wrap:wrap; gap:8px; }
-input[type="file"], button, select, input[type="number"], input[type="range"] {
-  padding:8px 15px; border-radius:5px; border:2px solid var(--border); background:var(--bg-color); color:var(--text-color); cursor:pointer; font-size:15px;
-}
-input[type="file"]:hover, button:hover, select:hover, input[type="number"]:hover, input[type="range"]:hover { background:var(--border); }
-textarea { width:100%; padding:10px; font-size:16px; border-radius:5px; border:2px solid var(--border); margin-bottom:10px; resize:vertical; background:var(--input-bg); color:var(--input-text); box-sizing:border-box; }
-.marquee-viewport, .marquee-rsvp { position:relative; overflow:hidden; height:120px; border:2px solid var(--border); margin:20px 0; display:flex; align-items:center; justify-content:flex-start; white-space:nowrap; }
-.marquee-rsvp { justify-content:center; text-align:center; }
-.screen-label { position:absolute; top:5px; right:5px; font-size:12px; color:var(--accent); }
-.reading-line { position:absolute; top:0; bottom:0; width:3px; left:50%; margin-left:-1.5px; background:var(--accent); pointer-events:none; z-index:2; }
-.marquee-track { display:inline-block; white-space:nowrap; }
-.word { display:inline-block; padding:0 2px; }
-.word.active { background:#FFD580; color:black; }
-.control-group { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:10px; align-items:center; }
-.footer { margin-top:auto; padding:10px; font-size:13px; opacity:0.6; text-align:center; }
-.pro-badge { font-size:12px; color:#ff9800; margin-left:4px; }
-@media(max-width:600px){ .top-bar{ flex-direction:row; justify-content:space-between; } textarea{ font-size:14px; } .marquee-viewport, .marquee-rsvp{ height:90px; } input[type="file"], button, select, input[type="number"], input[type="range"]{ font-size:14px; padding:6px 10px; min-width:50px; } }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text Speeder</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body data-theme="dark">
+<body>
+  <header>
+    <button id="uploadBtn">Upload Text</button>
+    <button id="loadBtn">Load Example</button>
+  </header>
 
-<div class="container">
-<h1>Text Speeder v10.1</h1>
+  <main>
+    <textarea id="textInput" placeholder="Paste or upload your text here..."></textarea>
+    
+    <div class="controls">
+      <label for="wpmInput">Speed (WPM):</label>
+      <input type="range" id="wpmSlider" min="100" max="1000" value="300">
+      <input type="number" id="wpmInput" value="300">
+    </div>
 
-<div class="top-bar">
-<label for="fileInput">Upload .txt file:
-<input type="file" id="fileInput" accept=".txt"/>
-</label>
-<div style="display:flex; gap:10px;">
-<button id="themeBtn">Dark / Light</button>
-<button id="accessibleBtn">Accessible Mode</button>
-</div>
-</div>
+    <div class="mode-select">
+      <label for="modeSelect">Mode:</label>
+      <select id="modeSelect">
+        <option value="flow">Flow</option>
+        <option value="rsvp">RSVP</option>
+      </select>
+    </div>
 
-<textarea id="textInput" rows="6" placeholder="Enter or upload your text here..."></textarea>
-<button id="loadBtn" style="margin:10px 0;">Load</button>
+    <div class="actions">
+      <button id="startBtn">Start</button>
+      <button id="pauseBtn">Pause</button>
+      <button id="startOverBtn">Start Over</button>
+    </div>
 
-<div class="control-group">
-<label>Mode:
-<select id="modeSelect">
-<option value="flow">Flow Only</option>
-<option value="flow-highlight" class="pro-feature">Flow + Highlight<span class="pro-badge">Pro</span></option>
-<option value="rsvp" class="pro-feature">RSVP<span class="pro-badge">Pro</span></option>
-</select>
-</label>
+    <div id="flowScreen" class="screen"></div>
+    <div id="rsvpScreen" class="screen">
+      <span id="rsvpWord"></span>
+    </div>
+  </main>
 
-<label>Font Type:
-<select id="fontType">
-<option value="Arial, sans-serif" selected>Default</option>
-<option value="'Spectrum', sans-serif">Regular</option>
-<option value="'Kalam', cursive">Handwriting</option>
-<option value="'Quatracento Sans', sans-serif">Sans</option>
-<option value="'Playfair Display', serif">Sans Serif</option>
-</select>
-</label>
-
-<label>Font Size:
-<select id="fontSize">
-<option value="16">Small</option>
-<option value="20" selected>Medium</option>
-<option value="26">Large</option>
-</select>
-</label>
-
-<label>Font Color:
-<select id="fontColor">
-<option value="#ffffff">White</option>
-<option value="#000000">Black</option>
-<option value="#00ff00">Green</option>
-<option value="#ff0000">Red</option>
-<option value="#00bfff">Blue</option>
-<option value="#ffff00">Yellow</option>
-</select>
-</label>
-
-<label>Flow BG:
-<select id="bgColor">
-<option value="#000000">Black</option>
-<option value="#1a1a1a">Dark Gray</option>
-<option value="#333333">Gray</option>
-<option value="#004466">Deep Blue</option>
-<option value="#660000">Dark Red</option>
-</select>
-</label>
-
-<label>WPM:
-<input type="number" id="wpmInput" min="50" max="1000" value="200">
-</label>
-
-<label>Speed Slider:
-<input type="range" id="wpmSlider" min="50" max="1000" value="200">
-</label>
-
-<button id="pauseBtn">Pause</button>
-<button id="startOverBtn">Start Over</button>
-</div>
-
-<!-- Flow screen -->
-<div class="marquee-viewport" id="flowScreen">
-<div class="reading-line"></div>
-<div class="marquee-track" id="marquee"></div>
-<div class="screen-label" id="flowLabel">Default</div>
-</div>
-
-<!-- RSVP screen -->
-<div class="marquee-rsvp" id="rsvpScreen" style="display:none;">
-<div class="word active" id="rsvpWord"></div>
-<div class="screen-label" id="rsvpLabel">RSVP</div>
-</div>
-
-<!-- Plans container -->
-<h3>Your Plans</h3>
-<ul id="plans"></ul>
-
-<div class="footer">© 2025 Text Speeder v10.1</div>
-
-<script type="module">
-import { createClient, OAuthStrategy } from 'https://unpkg.com/@wix/sdk/dist/sdk.module.js';
-import { plans } from 'https://unpkg.com/@wix/pricing-plans/dist/sdk.module.js';
-
-const myWixClient = createClient({
-    modules: { plans },
-    auth: OAuthStrategy({ clientId: '2da45afe-bd37-4453-a6ad-4a14b6c886' }) // your client ID
-});
-
-let purchasedPlanIds = []; 
-
-async function loadPlans() {
-    const plansList = await myWixClient.plans.listPublicPlans();
-    const container = document.getElementById('plans');
-    container.innerHTML = plansList.plans
-        .map(p => `<li>${p.name} - <button onclick="buyPlan('${p.id}')">Buy</button></li>`)
-        .join('');
-}
-
-// Redirect to Wix checkout
-window.buyPlan = function(planId) {
-    window.location.href = `https://akgnmutlu.wixstudio.com/text-speeder/checkout/${planId}`;
-}
-
-// Check purchased plans
-async function checkPurchasedPlans() {
-    // TODO: replace with real API check
-    purchasedPlanIds = ['plan-id-1','plan-id-2']; 
-    unlockProFeatures();
-}
-
-function unlockProFeatures() {
-    document.querySelectorAll('.pro-feature').forEach(option => {
-        option.disabled = !purchasedPlanIds.length;
-    });
-}
-
-loadPlans();
-checkPurchasedPlans();
-</script>
-
-<script>
-const marquee=document.getElementById('marquee');
-const rsvpWord=document.getElementById('rsvpWord');
-const textInput=document.getElementById('textInput');
-const wpmInput=document.getElementById('wpmInput');
-const wpmSlider=document.getElementById('wpmSlider');
-const loadBtn=document.getElementById('loadBtn');
-const pauseBtn=document.getElementById('pauseBtn');
-const startOverBtn=document.getElementById('startOverBtn');
-const flowScreen=document.getElementById('flowScreen');
-const rsvpScreen=document.getElementById('rsvpScreen');
-const modeSelect=document.getElementById('modeSelect');
-const fontTypeSelect=document.getElementById('fontType');
-const fontSizeSelect=document.getElementById('fontSize');
-const fontColorSelect=document.getElementById('fontColor');
-const bgColorSelect=document.getElementById('bgColor');
-
-let words=[], pos=0, animationId=null, isPaused=false, speed=1;
-let currentIndex=0;
-
-function applyStyles(){
-  [marquee,rsvpWord].forEach(el=>{
-    el.style.fontFamily=fontTypeSelect.value;
-    el.style.fontSize=fontSizeSelect.value+'px';
-    el.style.color=fontColorSelect.value;
-  });
-  flowScreen.style.background=bgColorSelect.value;
-  rsvpScreen.style.background=bgColorSelect.value;
-}
-
-function renderWords(){
-  words=textInput.value.trim().split(/\s+/);
-  applyStyles();
-
-  if(modeSelect.value==='rsvp'){
-    if(!purchasedPlanIds.length){ alert('RSVP mode is Pro only'); modeSelect.value='flow'; return; }
-    flowScreen.style.display='none';
-    rsvpScreen.style.display='flex';
-    currentIndex=0;
-    rsvpWord.textContent=words[0]||'';
-  } else if(modeSelect.value==='flow-highlight'){
-    if(!purchasedPlanIds.length){ alert('Flow+Highlight is Pro only'); modeSelect.value='flow'; return; }
-    flowScreen.style.display='flex';
-    rsvpScreen.style.display='none';
-    marquee.innerHTML='';
-    words.forEach(word=>{
-      const span=document.createElement('span');
-      span.className='word';
-      span.textContent=word+' ';
-      marquee.appendChild(span);
-    });
-    pos=flowScreen.clientWidth;
-  } else {
-    flowScreen.style.display='flex';
-    rsvpScreen.style.display='none';
-    marquee.innerHTML='';
-    words.forEach(word=>{
-      const span=document.createElement('span');
-      span.className='word';
-      span.textContent=word+' ';
-      marquee.appendChild(span);
-    });
-    pos=flowScreen.clientWidth;
-  }
-}
-
-function updateSpeed(){ speed=wpmInput.value/60; }
-
-function animateFlow(){
-  if(isPaused){ animationId=requestAnimationFrame(animateFlow); return;}
-  pos-=speed;
-  marquee.style.transform=`translateX(${pos}px)`;
-  if(modeSelect.value==='flow-highlight'){
-    const rect=flowScreen.getBoundingClientRect();
-    const centerX=rect.left+rect.width/2;
-    const spans=marquee.querySelectorAll('.word');
-    spans.forEach(s=>s.classList.remove('active'));
-    for(let s of spans){
-      const sRect=s.getBoundingClientRect();
-      if(sRect.left<=centerX && sRect.right>=centerX){
-        s.classList.add('active');
-        break;
-      }
-    }
-  }
-  if(pos+marquee.offsetWidth>0) animationId=requestAnimationFrame(animateFlow);
-}
-
-function animateRSVP(){
-  if(isPaused){ animationId=requestAnimationFrame(animateRSVP); return;}
-  if(currentIndex<words.length){
-    rsvpWord.textContent=words[currentIndex];
-    currentIndex++;
-    const interval=60000/wpmInput.value;
-    setTimeout(()=>{ animationId=requestAnimationFrame(animateRSVP); }, interval);
-  }
-}
-
-function startAnimation(){
-  cancelAnimationFrame(animationId);
-  applyStyles();
-  if(modeSelect.value==='rsvp'){ animateRSVP(); } 
-  else { animateFlow(); }
-}
-
-loadBtn.addEventListener('click',()=>{ renderWords(); startAnimation(); });
-pauseBtn.addEventListener('click',()=>{ isPaused=!isPaused; pauseBtn.textContent=isPaused?'Resume':'Pause'; });
-startOverBtn.addEventListener('click',()=>{
-  if(modeSelect.value==='rsvp') currentIndex=0;
-  else pos=flowScreen.clientWidth;
-  startAnimation();
-});
-wpmInput.addEventListener('input', ()=>{ let val=parseInt(wpmInput.value); if(isNaN(val)||val<50) val=50; if(val>1000) val=1000; wpmInput.value=val; wpmSlider.value=val; updateSpeed(); });
-wpmSlider.addEventListener('input', ()=>{ wpmInput.value=wpmSlider.value; updateSpeed(); });
-[fontTypeSelect,fontSizeSelect,fontColorSelect,bgColorSelect].forEach(el=>{ el.addEventListener('change', applyStyles); });
-document.getElementById('fileInput').addEventListener('change',e=>{ const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=evt=>{ textInput.value=evt.target.result; }; reader.readAsText(file); });
-document.getElementById('themeBtn').addEventListener('click', ()=>{ document.body.dataset.theme=document.body.dataset.theme==='light'?'dark':'light'; });
-modeSelect.addEventListener('change', () => { isPaused=false; pauseBtn.textContent='Pause'; renderWords(); startAnimation(); });
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
