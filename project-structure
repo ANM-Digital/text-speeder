@@ -1,0 +1,9 @@
+text-speeder/
+├─ index.html
+├─ success.html
+├─ cancel.html
+├─ netlify/
+│  └─ functions/
+│     └─ create-checkout-session.js
+├─ styles.css  (optional, if you want to separate CSS)
+├─ README.md
