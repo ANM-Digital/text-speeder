@@ -12,13 +12,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Install Netlify CLI
         run: npm install -g netlify-cli
 
-      - name: Build & Deploy
+      - name: Build & Deploy to Netlify
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           STRIPE_RESTRICTED_KEY: ${{ secrets.STRIPE_RESTRICTED_KEY }}
           URL: ${{ secrets.URL }}
         run: |
-          netlify deploy --prod --dir=. --functions=netlify/functions
+          echo "Starting Netlify deployment..."
+          netlify deploy --prod --dir=. --functions=netlify/functions --auth=$NETLIFY_AUTH_TOKEN
