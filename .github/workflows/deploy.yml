@@ -18,7 +18,7 @@ jobs:
       - name: Build & Deploy
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_RESTRICTED_KEY: ${{ secrets.STRIPE_RESTRICTED_KEY }}
           URL: ${{ secrets.URL }}
         run: |
           netlify deploy --prod --dir=. --functions=netlify/functions
