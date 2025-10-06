@@ -132,54 +132,26 @@ textarea { width:100%; padding:10px; font-size:16px; border-radius:5px; border:2
 <div class="screen-label" id="rsvpLabel">RSVP</div>
 </div>
 
-<!-- Plans container -->
-<h3>Your Plans</h3>
-<ul id="plans"></ul>
+<!-- Pro Upgrade -->
+<h3>Upgrade to Pro</h3>
+<button id="buyProBtn">Buy Pro – $9.99</button>
 
 <div class="footer">© 2025 Text Speeder v10.1</div>
 
 <script type="module">
-import { createClient, OAuthStrategy } from 'https://unpkg.com/@wix/sdk/dist/sdk.module.js';
-import { plans } from 'https://unpkg.com/@wix/pricing-plans/dist/sdk.module.js';
+// Stripe Netlify integration
+let purchasedPro = false;
 
-const myWixClient = createClient({
-    modules: { plans },
-    auth: OAuthStrategy({ clientId: '2da45afe-bd37-4453-a6ad-4a14b6c8a886' }) // your client ID
+document.getElementById('buyProBtn').addEventListener('click', async () => {
+  const res = await fetch('/.netlify/functions/create-checkout-session', { method: 'POST' });
+  const data = await res.json();
+  window.location.href = data.url;
 });
 
-let purchasedPlanIds = []; // Store purchased plan IDs
-
-// Load public plans
-async function loadPlans() {
-    const plansList = await myWixClient.plans.listPublicPlans();
-    const container = document.getElementById('plans');
-    container.innerHTML = plansList.plans
-        .map(p => `<li>${p.name} - <button onclick="buyPlan('${p.id}')">Buy</button></li>`)
-        .join('');
-}
-
-// Redirect to Wix checkout
-window.buyPlan = function(planId) {
-    window.location.href = `https://akgnmutlu.wixstudio.com/text-speeder/checkout/${planId}`;
-}
-
-// Example: Check which plans user owns (replace with real API check if needed)
-async function checkPurchasedPlans() {
-    // Placeholder: assume user purchased all plans for demo
-    // In production, call Wix API to verify user purchases
-    purchasedPlanIds = ['plan-id-1', 'plan-id-2']; 
-    unlockProFeatures();
-}
-
-// Enable Pro features for purchased plans
 function unlockProFeatures() {
-    document.querySelectorAll('.pro-feature').forEach(option => {
-        option.disabled = !purchasedPlanIds.length;
-    });
+  purchasedPro = true;
+  document.querySelectorAll('.pro-feature').forEach(option => { option.disabled = false; });
 }
-
-loadPlans();
-checkPurchasedPlans();
 </script>
 
 <script>
@@ -217,13 +189,13 @@ function renderWords(){
   applyStyles();
 
   if(modeSelect.value==='rsvp'){
-    if(!purchasedPlanIds.length){ alert('RSVP mode is Pro only'); modeSelect.value='flow'; return; }
+    if(!purchasedPro){ alert('RSVP mode is Pro only'); modeSelect.value='flow'; return; }
     flowScreen.style.display='none';
     rsvpScreen.style.display='flex';
     currentIndex=0;
     rsvpWord.textContent=words[0]||'';
   } else if(modeSelect.value==='flow-highlight'){
-    if(!purchasedPlanIds.length){ alert('Flow+Highlight is Pro only'); modeSelect.value='flow'; return; }
+    if(!purchasedPro){ alert('Flow+Highlight is Pro only'); modeSelect.value='flow'; return; }
     flowScreen.style.display='flex';
     rsvpScreen.style.display='none';
     marquee.innerHTML='';
@@ -261,10 +233,7 @@ function animateFlow(){
     spans.forEach(s=>s.classList.remove('active'));
     for(let s of spans){
       const sRect=s.getBoundingClientRect();
-      if(sRect.left<=centerX && sRect.right>=centerX){
-        s.classList.add('active');
-        break;
-      }
+      if(sRect.left<=centerX && sRect.right>=centerX){ s.classList.add('active'); break; }
     }
   }
   if(pos+marquee.offsetWidth>0) animationId=requestAnimationFrame(animateFlow);
@@ -283,8 +252,7 @@ function animateRSVP(){
 function startAnimation(){
   cancelAnimationFrame(animationId);
   applyStyles();
-  if(modeSelect.value==='rsvp'){ animateRSVP(); } 
-  else { animateFlow(); }
+  if(modeSelect.value==='rsvp'){ animateRSVP(); } else { animateFlow(); }
 }
 
 // Load button
@@ -295,8 +263,7 @@ pauseBtn.addEventListener('click',()=>{ isPaused=!isPaused; pauseBtn.textContent
 
 // Start Over
 startOverBtn.addEventListener('click',()=>{
-  if(modeSelect.value==='rsvp') currentIndex=0;
-  else pos=flowScreen.clientWidth;
+  if(modeSelect.value==='rsvp') currentIndex=0; else pos=flowScreen.clientWidth;
   startAnimation();
 });
 
@@ -314,7 +281,10 @@ document.getElementById('fileInput').addEventListener('change',e=>{ const file=e
 document.getElementById('themeBtn').addEventListener('click', ()=>{ document.body.dataset.theme=document.body.dataset.theme==='light'?'dark':'light'; });
 
 // Mode change listener
-modeSelect.addEventListener('change', () => { isPaused=false; pauseBtn.textContent='Pause'; renderWords(); startAnimation(); });
+modeSelect.addEventListener('change', () => {
+  if(modeSelect.value!=='flow' && !purchasedPro){ alert('Pro features require purchase.'); modeSelect.value='flow'; return; }
+  isPaused=false; pauseBtn.textContent='Pause'; renderWords(); startAnimation();
+});
 </script>
 </body>
 </html>
