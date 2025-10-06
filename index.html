@@ -144,14 +144,10 @@ import { plans } from 'https://unpkg.com/@wix/pricing-plans/dist/sdk.module.js';
 
 const myWixClient = createClient({
     modules: { plans },
-    auth: OAuthStrategy({ clientId: '2da45afe-bd37-4453-a6ad-4a14b6c886' })
+    auth: OAuthStrategy({ clientId: '2da45afe-bd37-4453-a6ad-4a14b6c886' }) // your client ID
 });
 
-let purchasedPlanIds = [];
-const featurePlans = {
-    'flow-highlight': 'plan-id-1',  // Flow+Highlight
-    'rsvp': 'plan-id-2'             // RSVP
-};
+let purchasedPlanIds = []; 
 
 async function loadPlans() {
     const plansList = await myWixClient.plans.listPublicPlans();
@@ -161,29 +157,21 @@ async function loadPlans() {
         .join('');
 }
 
+// Redirect to Wix checkout
 window.buyPlan = function(planId) {
     window.location.href = `https://akgnmutlu.wixstudio.com/text-speeder/checkout/${planId}`;
 }
 
+// Check purchased plans
 async function checkPurchasedPlans() {
-    // Demo: assume both plans purchased
-    purchasedPlanIds = ['plan-id-1','plan-id-2'];
-    updateFeatureUI();
+    // TODO: replace with real API check
+    purchasedPlanIds = ['plan-id-1','plan-id-2']; 
+    unlockProFeatures();
 }
 
-function updateFeatureUI() {
-    const select = document.getElementById('modeSelect');
-    Array.from(select.options).forEach(option => {
-        if(featurePlans[option.value]){
-            if(!purchasedPlanIds.includes(featurePlans[option.value])){
-                option.disabled = true;
-                option.textContent = option.textContent.split(' ')[0] + ` (Pro)`;
-                option.title = `Requires ${featurePlans[option.value]} plan`;
-            } else {
-                option.disabled = false;
-                option.title = '';
-            }
-        }
+function unlockProFeatures() {
+    document.querySelectorAll('.pro-feature').forEach(option => {
+        option.disabled = !purchasedPlanIds.length;
     });
 }
 
@@ -226,13 +214,13 @@ function renderWords(){
   applyStyles();
 
   if(modeSelect.value==='rsvp'){
-    if(!purchasedPlanIds.includes(featurePlans['rsvp'])){ alert('RSVP mode is Pro only'); modeSelect.value='flow'; return; }
+    if(!purchasedPlanIds.length){ alert('RSVP mode is Pro only'); modeSelect.value='flow'; return; }
     flowScreen.style.display='none';
     rsvpScreen.style.display='flex';
     currentIndex=0;
     rsvpWord.textContent=words[0]||'';
   } else if(modeSelect.value==='flow-highlight'){
-    if(!purchasedPlanIds.includes(featurePlans['flow-highlight'])){ alert('Flow+Highlight is Pro only'); modeSelect.value='flow'; return; }
+    if(!purchasedPlanIds.length){ alert('Flow+Highlight is Pro only'); modeSelect.value='flow'; return; }
     flowScreen.style.display='flex';
     rsvpScreen.style.display='none';
     marquee.innerHTML='';
@@ -296,33 +284,18 @@ function startAnimation(){
   else { animateFlow(); }
 }
 
-// Load button
 loadBtn.addEventListener('click',()=>{ renderWords(); startAnimation(); });
-
-// Pause/Resume
 pauseBtn.addEventListener('click',()=>{ isPaused=!isPaused; pauseBtn.textContent=isPaused?'Resume':'Pause'; });
-
-// Start Over
 startOverBtn.addEventListener('click',()=>{
   if(modeSelect.value==='rsvp') currentIndex=0;
   else pos=flowScreen.clientWidth;
   startAnimation();
 });
-
-// WPM input/slider sync
 wpmInput.addEventListener('input', ()=>{ let val=parseInt(wpmInput.value); if(isNaN(val)||val<50) val=50; if(val>1000) val=1000; wpmInput.value=val; wpmSlider.value=val; updateSpeed(); });
 wpmSlider.addEventListener('input', ()=>{ wpmInput.value=wpmSlider.value; updateSpeed(); });
-
-// Font/Color/BG changes
 [fontTypeSelect,fontSizeSelect,fontColorSelect,bgColorSelect].forEach(el=>{ el.addEventListener('change', applyStyles); });
-
-// File upload
 document.getElementById('fileInput').addEventListener('change',e=>{ const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=evt=>{ textInput.value=evt.target.result; }; reader.readAsText(file); });
-
-// Theme toggle
 document.getElementById('themeBtn').addEventListener('click', ()=>{ document.body.dataset.theme=document.body.dataset.theme==='light'?'dark':'light'; });
-
-// Mode change listener
 modeSelect.addEventListener('change', () => { isPaused=false; pauseBtn.textContent='Pause'; renderWords(); startAnimation(); });
 </script>
 </body>
