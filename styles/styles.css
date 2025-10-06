@@ -1,1 +1,31 @@
+:root {
+  --bg-color:#111; --text-color:#fff; --border:#444;
+  --input-bg:#ccc; --input-text:#000; --flow-bg:#000; --accent:red;
+}
+[data-theme="light"] {
+  --bg-color:#f5f5f5; --text-color:#000; --border:#aaa;
+  --input-bg:#fff; --input-text:#111; --flow-bg:#f0f0f0; --accent:#0077ff;
+}
+body { margin:0; padding:0; background:var(--bg-color); color:var(--text-color);
+  font-family:"Arial",sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100vh;
+}
+h1 { text-align:center; margin:10px 0; font-size:2rem; }
+.container { width:95%; max-width:900px; text-align:center; position:relative; }
+.top-bar { display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:10px; flex-wrap:wrap; gap:8px; }
+input[type="file"], button, select, input[type="number"], input[type="range"] {
+  padding:8px 15px; border-radius:5px; border:2px solid var(--border); background:var(--bg-color); color:var(--text-color); cursor:pointer; font-size:15px;
+}
+input[type="file"]:hover, button:hover, select:hover, input[type="number"]:hover, input[type="range"]:hover { background:var(--border); }
+textarea { width:100%; padding:10px; font-size:16px; border-radius:5px; border:2px solid var(--border); margin-bottom:10px; resize:vertical; background:var(--input-bg); color:var(--input-text); box-sizing:border-box; }
+.marquee-viewport, .marquee-rsvp { position:relative; overflow:hidden; height:120px; border:2px solid var(--border); margin:20px 0; display:flex; align-items:center; justify-content:flex-start; white-space:nowrap; }
+.marquee-rsvp { justify-content:center; text-align:center; }
+.screen-label { position:absolute; top:5px; right:5px; font-size:12px; color:var(--accent); }
+.reading-line { position:absolute; top:0; bottom:0; width:3px; left:50%; margin-left:-1.5px; background:var(--accent); pointer-events:none; z-index:2; }
+.marquee-track { display:inline-block; white-space:nowrap; }
+.word { display:inline-block; padding:0 2px; }
+.word.active { background:#FFD580; color:black; }
+.control-group { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:10px; align-items:center; }
+.footer { margin-top:auto; padding:10px; font-size:13px; opacity:0.6; text-align:center; }
+.pro-badge { font-size:12px; color:#ff9800; margin-left:4px; }
+@media(max-width:600px){ .top-bar{ flex-direction:row; justify-content:space-between; } textarea{ font-size:14px; } .marquee-viewport, .marquee-rsvp{ height:90px; } input[type="file"], button, select, input[type="number"], input[type="range"]{ font-size:14px; padding:6px 10px; min-width:50px; } }
 
