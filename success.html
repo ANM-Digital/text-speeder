@@ -3,13 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <title>Payment Successful</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="styles/styles.css">
 </head>
-<body>
-<h1>Thank you for purchasing Pro!</h1>
-<p><a href="/">Go back to Text Speeder</a></p>
-<script>
-localStorage.setItem('purchasedPro', 'true');
+<body data-theme="dark">
+
+<div class="container">
+  <h1>Thank you for purchasing Pro!</h1>
+  <p>Your premium features are now unlocked.</p>
+  <p><a href="/">Go back to Text Speeder</a></p>
+
+  <!-- Optional ad placeholder (hidden for paid users) -->
+  <div class="ad-slot" style="display:none;"></div>
+
+</div>
+
+<script type="module">
+  // Unlock Pro in localStorage
+  import { unlockPro } from './scripts/stripe.js';
+  unlockPro();
+
+  // Hide ads for Pro users
+  import { hideAds } from './scripts/ads.js';
+  hideAds();
 </script>
+
 </body>
 </html>
-
