@@ -1,15 +1,20 @@
-// Stripe integration (Netlify functions)
-export async function checkoutPro() {
-  const res = await fetch('/.netlify/functions/create-checkout-session', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ product: "prod_TBGWcCeAc21K2T" }) // change to your product
-  });
-  const data = await res.json();
-  window.location.href = data.url;
+// Simple ad handling logic
+export function showAds() {
+  document.querySelectorAll('.ad-slot').forEach(ad => ad.style.display = 'block');
 }
 
-export function unlockPro() {
-  localStorage.setItem('purchasedPro', 'true');
+export function hideAds() {
+  document.querySelectorAll('.ad-slot').forEach(ad => ad.style.display = 'none');
 }
 
+// Rewarded Premium Timer (12 hours)
+export function isRewardedActive() {
+  const end = localStorage.getItem('rewardedPremiumEnd');
+  return end && Date.now() < parseInt(end);
+}
+
+export function grantRewardedPremium(hours = 12) {
+  const expireTime = Date.now() + hours*60*60*1000;
+  localStorage.setItem('rewardedPremiumEnd', expireTime);
+  hideAds();
+}
